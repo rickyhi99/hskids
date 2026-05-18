@@ -1,0 +1,13 @@
+.rabbit {
+  width: 120px;
+  height: auto;
+  display: block;
+  margin: 0 auto 1rem;
+  will-change: transform;
+}
+
+@media (max-width: 768px) {
+  .rabbit {
+    width: 100px;
+  }
+}

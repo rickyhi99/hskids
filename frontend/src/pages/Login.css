@@ -1,0 +1,188 @@
+.login-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-panel {
+  width: 360px;
+  max-width: 90%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.37);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  padding: 2rem;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+  max-height: 380px;
+}
+
+.login-panel.registering {
+  max-height: min(850px, 80vh);
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.login-panel.registering .panel-content {
+  max-height: calc(min(850px, 80vh) - 5rem);
+  overflow-y: auto;
+  padding-right: 12px;
+  margin-right: -12px;
+}
+
+.panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-back {
+  background: transparent;
+  border: none;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+.btn-back:hover {
+  color: #fff;
+}
+
+.panel-content h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.panel-content label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.panel-content label span {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.panel-content input,
+.panel-content select {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.panel-content input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.panel-content select option {
+  color: #000;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.3s;
+}
+
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-link-container {
+  height: 2rem;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.toggle-link {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-link.empty {
+  pointer-events: none;
+}
+
+.toggle-link a {
+  color: #e0e0e0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.toggle-link a:hover {
+  color: #fff;
+}
+
+.validation-msg {
+  font-size: 12px;
+  margin-top: 4px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.validation-msg.success {
+  color: #28a745;
+}
+
+.validation-msg.error {
+  color: #dc3545;
+}
+
+.validation-msg.checking {
+  color: #6c757d;
+}
