@@ -1,10 +1,10 @@
-package com.team.blog.comment.dto;
+package com.team.blog.domain.board.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class CommentUpdateRequest {
+public class CommentCreateRequest {
     private String content;
 }

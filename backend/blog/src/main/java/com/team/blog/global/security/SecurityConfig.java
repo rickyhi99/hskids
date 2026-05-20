@@ -1,4 +1,4 @@
-package com.team.blog.config;
+package com.team.blog.global.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
