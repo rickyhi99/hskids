@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Write from './pages/Write';
 
 function PrivateRoute({ children }) {
   const { currentUser } = useAuth();
@@ -30,6 +31,14 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <Home />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/write"
+        element={
+          <PrivateRoute>
+            <Write />
           </PrivateRoute>
         }
       />
