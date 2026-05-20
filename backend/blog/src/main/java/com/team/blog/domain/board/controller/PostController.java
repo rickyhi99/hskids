@@ -1,8 +1,9 @@
-package com.team.blog.post;
+package com.team.blog.domain.board.controller;
 
-import com.team.blog.post.dto.PostCreateRequest;
-import com.team.blog.post.dto.PostResponse;
-import com.team.blog.post.dto.PostUpdateRequest;
+import com.team.blog.domain.board.dto.request.PostCreateRequest;
+import com.team.blog.domain.board.dto.request.PostUpdateRequest;
+import com.team.blog.domain.board.dto.response.PostResponse;
+import com.team.blog.domain.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,5 @@
 package com.team.blog.config;
+package com.team.blog.global.config;
 
 import org.h2.server.web.JakartaWebServlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -15,4 +16,5 @@ public class WebConfig {
         bean.addInitParameter("webAllowOthers", "true");
         return bean;
     }
+}
 }

@@ -1,7 +1,7 @@
-package com.team.blog.comment;
+package com.team.blog.domain.board.entity;
 
-import com.team.blog.comment.dto.CommentCreateRequest;
-import com.team.blog.comment.dto.CommentUpdateRequest;
+import com.team.blog.domain.board.dto.request.CommentCreateRequest;
+import com.team.blog.domain.board.dto.request.CommentUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
