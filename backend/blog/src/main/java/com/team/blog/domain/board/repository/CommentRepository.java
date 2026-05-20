@@ -1,5 +1,6 @@
-package com.team.blog.comment;
+package com.team.blog.domain.board.repository;
 
+import com.team.blog.domain.board.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.team.blog.post;
+package com.team.blog.domain.board.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
