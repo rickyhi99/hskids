@@ -1,6 +1,6 @@
-package com.team.blog.comment.dto;
+package com.team.blog.domain.board.dto.response;
 
-import com.team.blog.comment.Comment;
+import com.team.blog.domain.board.entity.Comment;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

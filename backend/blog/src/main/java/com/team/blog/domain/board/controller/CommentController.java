@@ -1,8 +1,9 @@
-package com.team.blog.comment;
+package com.team.blog.domain.board.controller;
 
-import com.team.blog.comment.dto.CommentCreateRequest;
-import com.team.blog.comment.dto.CommentResponse;
-import com.team.blog.comment.dto.CommentUpdateRequest;
+import com.team.blog.domain.board.dto.request.CommentCreateRequest;
+import com.team.blog.domain.board.dto.request.CommentUpdateRequest;
+import com.team.blog.domain.board.dto.response.CommentResponse;
+import com.team.blog.domain.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

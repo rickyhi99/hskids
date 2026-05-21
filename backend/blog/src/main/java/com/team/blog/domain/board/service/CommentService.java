@@ -1,9 +1,11 @@
-package com.team.blog.comment;
+package com.team.blog.domain.board.service;
 
-import com.team.blog.comment.dto.CommentCreateRequest;
-import com.team.blog.comment.dto.CommentResponse;
-import com.team.blog.comment.dto.CommentUpdateRequest;
-import com.team.blog.post.PostRepository;
+import com.team.blog.domain.board.dto.request.CommentCreateRequest;
+import com.team.blog.domain.board.dto.request.CommentUpdateRequest;
+import com.team.blog.domain.board.dto.response.CommentResponse;
+import com.team.blog.domain.board.entity.Comment;
+import com.team.blog.domain.board.repository.CommentRepository;
+import com.team.blog.domain.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

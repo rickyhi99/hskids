@@ -1,6 +1,6 @@
-package com.team.blog.post.dto;
+package com.team.blog.domain.board.dto.request;
 
-import com.team.blog.common.Visibility;
+import com.team.blog.domain.board.entity.Visibility;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

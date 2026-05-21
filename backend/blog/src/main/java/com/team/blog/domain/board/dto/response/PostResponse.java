@@ -1,7 +1,7 @@
-package com.team.blog.post.dto;
+package com.team.blog.domain.board.dto.response;
 
-import com.team.blog.common.Visibility;
-import com.team.blog.post.Post;
+import com.team.blog.domain.board.entity.Post;
+import com.team.blog.domain.board.entity.Visibility;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

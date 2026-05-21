@@ -1,4 +1,4 @@
-package com.team.blog.common;
+package com.team.blog.domain.board.entity;
 
 public enum Visibility {
     PUBLIC,
