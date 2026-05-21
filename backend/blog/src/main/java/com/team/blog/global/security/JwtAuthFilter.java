@@ -1,4 +1,4 @@
-package com.team.blog.auth;
+package com.team.blog.global.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,11 +33,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String userId = jwtUtil.getUserId(token);
                 String role   = jwtUtil.getRole(token);
 
+                List<SimpleGrantedAuthority> authorities = (role != null && !role.isBlank())
+                        ? List.of(new SimpleGrantedAuthority(role))
+                        : List.of();
+
                 UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                userId, null,
-                                List.of(new SimpleGrantedAuthority(role))
-                        );
+                        new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

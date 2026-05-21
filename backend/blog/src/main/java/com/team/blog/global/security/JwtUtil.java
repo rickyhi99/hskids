@@ -1,4 +1,4 @@
-package com.team.blog.auth;
+package com.team.blog.global.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
