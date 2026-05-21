@@ -8,7 +8,7 @@ import com.team.blog.domain.neighbor.dto.response.NeighborUserResponse;
 import com.team.blog.domain.neighbor.entity.Neighbor;
 import com.team.blog.domain.neighbor.entity.NeighborStatus;
 import com.team.blog.domain.neighbor.repository.NeighborRepository;
-import com.team.blog.domain.user.entity.User;
+import com.team.blog.domain.user.entity.UserEntity;
 import com.team.blog.domain.user.repository.UserRepository;
 import com.team.blog.global.api.ErrorCode;
 import com.team.blog.global.exception.ApiException;
@@ -96,11 +96,11 @@ public class NeighborService {
                 ? neighbor.getToUserId()
                 : neighbor.getFromUserId();
 
-        User otherUser = userRepository.findById(otherUserId)
+        UserEntity otherUserEntity = userRepository.findById(otherUserId)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         neighborRepository.delete(neighbor);
-        return NeighborUserResponse.of(neighborId, otherUser);
+        return NeighborUserResponse.of(neighborId, otherUserEntity);
     }
 
     /**
@@ -117,9 +117,9 @@ public class NeighborService {
                     Long otherUserId = neighbor.getFromUserId().equals(userId)
                             ? neighbor.getToUserId()
                             : neighbor.getFromUserId();
-                    User otherUser = userRepository.findById(otherUserId)
+                    UserEntity otherUserEntity = userRepository.findById(otherUserId)
                             .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-                    return NeighborUserResponse.of(neighbor.getId(), otherUser);
+                    return NeighborUserResponse.of(neighbor.getId(), otherUserEntity);
                 })
                 .toList();
     }
@@ -135,9 +135,9 @@ public class NeighborService {
         return neighborRepository.findByToUserIdAndStatus(userId, NeighborStatus.PENDING)
                 .stream()
                 .map(neighbor -> {
-                    User fromUser = userRepository.findById(neighbor.getFromUserId())
+                    UserEntity fromUserEntity = userRepository.findById(neighbor.getFromUserId())
                             .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
-                    return NeighborRequestResponse.of(neighbor, fromUser);
+                    return NeighborRequestResponse.of(neighbor, fromUserEntity);
                 })
                 .toList();
     }

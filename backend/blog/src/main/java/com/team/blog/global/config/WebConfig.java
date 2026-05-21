@@ -1,4 +1,3 @@
-package com.team.blog.config;
 package com.team.blog.global.config;
 
 import org.h2.server.web.JakartaWebServlet;
@@ -17,4 +16,4 @@ public class WebConfig {
         return bean;
     }
 }
-}
+

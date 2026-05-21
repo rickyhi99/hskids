@@ -1,4 +1,4 @@
-package com.team.blog.dto;
+package com.team.blog.global.auth.dto;
 
 import lombok.*;
 
