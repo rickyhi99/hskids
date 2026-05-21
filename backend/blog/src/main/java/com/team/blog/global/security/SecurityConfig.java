@@ -1,43 +1,42 @@
 package com.team.blog.global.security;
 
-import com.team.blog.auth.JwtAuthFilter;
-import com.team.blog.auth.JwtUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final JwtUtil jwtUtil;
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .formLogin(auth -> auth.disable())
-            .httpBasic(auth -> auth.disable())
-            .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/login", "/join", "/h2-console/**").permitAll()
-                    .anyRequest().authenticated())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .requestMatchers("/h2-console/**").permitAll()
+                .anyRequest().permitAll()
+            )
+            .csrf(csrf -> csrf.disable())
+                // from 방식 로그인, http basic 인증 disable
+                .formLogin((auth) -> auth.disable())
+                .httpBasic((auth) -> auth.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
+        // 경로별 인가 작업
+        http
+            .authorizeHttpRequests((auth) -> auth
+                    // 1. 비회원도 접근 가능한 '오픈 구간' (로그인, 메인, 회원가입, H2 콘솔(개발 기간에만))
+                    .requestMatchers("/", "/login", "/join", "/h2-console/**").permitAll()
+
+                    // 2. 그 외의 나머지 모든 주소는 '로그인한 회원만' 접근 가능
+                    .anyRequest().authenticated());
+
+        // 세션을 무상태로 만든다
+        http
+            .sessionManagement((session) -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 }

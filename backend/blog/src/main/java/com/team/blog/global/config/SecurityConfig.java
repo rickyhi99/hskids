@@ -1,4 +1,4 @@
-package com.team.blog.global.security;
+package com.team.blog.config;
 
 import com.team.blog.auth.JwtAuthFilter;
 import com.team.blog.auth.JwtUtil;
