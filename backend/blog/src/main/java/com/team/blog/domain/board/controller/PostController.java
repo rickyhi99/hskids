@@ -60,6 +60,18 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.success(postService.getOne(postId)));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getMyPosts(
+            @RequestHeader("X-User-Id") Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(postService.getMyPosts(userId)));
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getUserPosts(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(postService.getUserPosts(userId)));
+    }
+
     @PostMapping("/{postId}/like")
     public ResponseEntity<ApiResponse<Void>> like(
             @RequestHeader("X-User-Id") Long userId,
