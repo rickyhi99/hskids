@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByVisibilityOrderByLikeCountDesc(Visibility visibility);
+    List<Post> findAllByUserIdOrderByCreatedAtDesc(Long userId);
+    List<Post> findAllByUserIdAndVisibilityOrderByCreatedAtDesc(Long userId, Visibility visibility);
 }

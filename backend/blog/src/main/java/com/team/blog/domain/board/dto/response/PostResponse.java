@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class PostResponse {
     private final Long id;
     private final Long userId;
+    private final String nickname;
     private final Long categoryId;
     private final String title;
     private final String content;
@@ -19,9 +20,10 @@ public class PostResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public PostResponse(Post post) {
+    public PostResponse(Post post, String nickname) {
         this.id = post.getId();
         this.userId = post.getUserId();
+        this.nickname = nickname;
         this.categoryId = post.getCategoryId();
         this.title = post.getTitle();
         this.content = post.getContent();
