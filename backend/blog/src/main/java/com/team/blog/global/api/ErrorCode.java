@@ -9,14 +9,24 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
+    // Global
+    GLOBAL_INVALID_INPUT(HttpStatus.BAD_REQUEST, "필수 입력값이 누락되었거나 형식이 올바르지 않습니다."),
+
     // Auth
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다"),
+    AUTH_MISMATCH(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다."),
+    AUTH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "인증 토큰이 만료되었습니다. 다시 로그인 해 주세요."),
+    AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않거나 변조된 토큰입니다."),
 
     // User
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다"),
+    USER_DUPLICATED_ID(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
+    USER_DUPLICATED_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
+    USER_DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
+    USER_WITHDRAWN(HttpStatus.FORBIDDEN, "이미 탈퇴 처리된 계정입니다."),
+    USER_PASSWORD_SAME(HttpStatus.BAD_REQUEST, "기존과 동일한 비밀번호로 변경할 수 없습니다."),
 
     // Neighbor
+    NEIGHBOR_WITHDRAWN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     NEIGHBOR_NOT_FOUND(HttpStatus.NOT_FOUND, "이웃 관계를 찾을 수 없습니다"),
     SELF_NEIGHBOR_REQUEST(HttpStatus.BAD_REQUEST, "자기 자신에게 이웃 신청을 할 수 없습니다"),
     NEIGHBOR_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 이웃 신청했거나 이미 이웃 관계입니다"),
