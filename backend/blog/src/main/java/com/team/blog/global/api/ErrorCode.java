@@ -25,6 +25,10 @@ public enum ErrorCode {
     USER_WITHDRAWN(HttpStatus.FORBIDDEN, "이미 탈퇴 처리된 계정입니다."),
     USER_PASSWORD_SAME(HttpStatus.BAD_REQUEST, "기존과 동일한 비밀번호로 변경할 수 없습니다."),
 
+    // Category
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리를 찾을 수 없습니다."),
+    CATEGORY_FORBIDDEN(HttpStatus.FORBIDDEN, "본인의 카테고리만 수정/삭제할 수 있습니다."),
+
     // Neighbor
     NEIGHBOR_WITHDRAWN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     NEIGHBOR_NOT_FOUND(HttpStatus.NOT_FOUND, "이웃 관계를 찾을 수 없습니다"),
