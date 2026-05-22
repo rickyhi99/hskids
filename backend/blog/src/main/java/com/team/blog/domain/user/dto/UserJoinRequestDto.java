@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserJoinRequestDto {
     private String id;
-    private String pwd;
+    private String password;
     private String email;
     private String nickname;
 }

@@ -2,8 +2,10 @@ package com.team.blog.global.auth.service;
 
 import com.team.blog.domain.user.entity.UserEntity;
 import com.team.blog.domain.user.repository.UserRepository;
+import com.team.blog.global.api.ErrorCode;
 import com.team.blog.global.auth.dto.LoginRequestDto;
 import com.team.blog.global.auth.dto.TokenResponseDto;
+import com.team.blog.global.exception.ApiException;
 import com.team.blog.global.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,10 +21,10 @@ public class AuthService {
 
     public TokenResponseDto login(LoginRequestDto dto) {
         UserEntity user = userRepository.findByLoginId(dto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 틀렸습니다."));
+                .orElseThrow(() -> new ApiException(ErrorCode.AUTH_MISMATCH));
 
-        if (!passwordEncoder.matches(dto.getPwd(), user.getPassword())) {
-            throw new IllegalArgumentException("아이디 또는 비밀번호가 틀렸습니다.");
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new ApiException(ErrorCode.AUTH_MISMATCH);
         }
 
         return TokenResponseDto.builder()
@@ -33,12 +35,12 @@ public class AuthService {
 
     public TokenResponseDto refresh(String refreshToken) {
         if (!jwtUtil.isValid(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+            throw new ApiException(ErrorCode.AUTH_INVALID_TOKEN);
         }
 
         String loginId = jwtUtil.getUserId(refreshToken);
         UserEntity user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         return TokenResponseDto.builder()
                 .accessToken(jwtUtil.createAccessToken(user.getLoginId(), user.getRole()))

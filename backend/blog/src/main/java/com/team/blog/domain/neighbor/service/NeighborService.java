@@ -65,7 +65,7 @@ public class NeighborService {
                 .orElseThrow(() -> new ApiException(ErrorCode.NEIGHBOR_NOT_FOUND));
 
         if (!neighbor.getToUserId().equals(userId)) {
-            throw new ApiException(ErrorCode.FORBIDDEN);
+            throw new ApiException(ErrorCode.NEIGHBOR_WITHDRAWN);
         }
 
         if (request.getStatus() == NeighborStatus.REJECTED) {
@@ -92,7 +92,7 @@ public class NeighborService {
                 .orElseThrow(() -> new ApiException(ErrorCode.NEIGHBOR_NOT_FOUND));
 
         if (!neighbor.getFromUserId().equals(userId) && !neighbor.getToUserId().equals(userId)) {
-            throw new ApiException(ErrorCode.FORBIDDEN);
+            throw new ApiException(ErrorCode.NEIGHBOR_WITHDRAWN);
         }
 
         Long otherUserId = neighbor.getFromUserId().equals(userId)
