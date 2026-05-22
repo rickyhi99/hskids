@@ -29,12 +29,13 @@ public class NeighborService {
     /**
      * 이웃 신청
      *
-     * @param fromUserId 신청하는 유저 id
-     * @param request    신청 요청 DTO
+     * @param loginId JWT에서 추출한 로그인 아이디
+     * @param request 신청 요청 DTO
      * @return 생성된 이웃 관계 정보
      */
     @Transactional
-    public NeighborDetailResponse sendRequest(Long fromUserId, NeighborRequest request) {
+    public NeighborDetailResponse sendRequest(String loginId, NeighborRequest request) {
+        Long fromUserId = resolveUserId(loginId);
         Long toUserId = request.getToUserId();
 
         if (fromUserId.equals(toUserId)) {
@@ -52,13 +53,14 @@ public class NeighborService {
     /**
      * 이웃 신청 수락/거절 — 거절 시 row 삭제
      *
-     * @param userId     수신자 유저 id
+     * @param loginId    JWT에서 추출한 로그인 아이디
      * @param neighborId 이웃 관계 id
      * @param request    상태 변경 요청 DTO
      * @return 변경된 이웃 관계 정보
      */
     @Transactional
-    public NeighborDetailResponse updateStatus(Long userId, Long neighborId, NeighborUpdateRequest request) {
+    public NeighborDetailResponse updateStatus(String loginId, Long neighborId, NeighborUpdateRequest request) {
+        Long userId = resolveUserId(loginId);
         Neighbor neighbor = neighborRepository.findById(neighborId)
                 .orElseThrow(() -> new ApiException(ErrorCode.NEIGHBOR_NOT_FOUND));
 
@@ -79,12 +81,13 @@ public class NeighborService {
     /**
      * 이웃 삭제
      *
-     * @param userId     요청 유저 id
+     * @param loginId    JWT에서 추출한 로그인 아이디
      * @param neighborId 이웃 관계 id
      * @return 삭제된 이웃의 유저 정보
      */
     @Transactional
-    public NeighborUserResponse delete(Long userId, Long neighborId) {
+    public NeighborUserResponse delete(String loginId, Long neighborId) {
+        Long userId = resolveUserId(loginId);
         Neighbor neighbor = neighborRepository.findById(neighborId)
                 .orElseThrow(() -> new ApiException(ErrorCode.NEIGHBOR_NOT_FOUND));
 
@@ -106,11 +109,12 @@ public class NeighborService {
     /**
      * 이웃 목록 조회
      *
-     * @param userId 요청 유저 id
+     * @param loginId JWT에서 추출한 로그인 아이디
      * @return 수락된 이웃 유저 정보 목록
      */
     @Transactional(readOnly = true)
-    public List<NeighborUserResponse> getNeighbors(Long userId) {
+    public List<NeighborUserResponse> getNeighbors(String loginId) {
+        Long userId = resolveUserId(loginId);
         return neighborRepository.findByUserIdAndStatus(userId, NeighborStatus.ACCEPTED)
                 .stream()
                 .map(neighbor -> {
@@ -127,11 +131,12 @@ public class NeighborService {
     /**
      * 받은 이웃 신청 목록 조회
      *
-     * @param userId 수신자 유저 id
+     * @param loginId JWT에서 추출한 로그인 아이디
      * @return 대기 중인 이웃 신청 목록
      */
     @Transactional(readOnly = true)
-    public List<NeighborRequestResponse> getReceivedRequests(Long userId) {
+    public List<NeighborRequestResponse> getReceivedRequests(String loginId) {
+        Long userId = resolveUserId(loginId);
         return neighborRepository.findByToUserIdAndStatus(userId, NeighborStatus.PENDING)
                 .stream()
                 .map(neighbor -> {
@@ -140,5 +145,11 @@ public class NeighborService {
                     return NeighborRequestResponse.of(neighbor, fromUserEntity);
                 })
                 .toList();
+    }
+
+    private Long resolveUserId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND))
+                .getId();
     }
 }
