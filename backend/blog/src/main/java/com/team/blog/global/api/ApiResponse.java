@@ -11,7 +11,7 @@ public record ApiResponse<T>(
     }
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(Status.SUCCESS, SuccessCode.SUCCESS_DEFAULT, data);
+        return new ApiResponse<>(Status.SUCCESS, SuccessCode.SUCCESS_OK, data);
     }
 
     public static ApiResponse<Void> success(SuccessCode successCode) {
@@ -19,7 +19,7 @@ public record ApiResponse<T>(
     }
 
     public static ApiResponse<Void> success() {
-        return new ApiResponse<>(Status.SUCCESS, SuccessCode.SUCCESS_DEFAULT, null);
+        return new ApiResponse<>(Status.SUCCESS, SuccessCode.SUCCESS_OK, null);
     }
 
     public static <T> ApiResponse<T> fail(ErrorCode errorCode, T data) {
