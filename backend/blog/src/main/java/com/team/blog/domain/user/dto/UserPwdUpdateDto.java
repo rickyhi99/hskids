@@ -1,15 +1,12 @@
-package com.team.blog.dto;
+package com.team.blog.domain.user.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserPwdUpdateDto {
     private String id;
     private String email;
+    private String newPwd;
 }
