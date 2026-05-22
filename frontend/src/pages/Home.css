@@ -57,6 +57,22 @@
   transform: rotate(20deg);
 }
 
+.btn-profile {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: none;
+  border: 1.5px solid var(--border-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
+}
+.btn-profile:hover { background: var(--border-light); color: var(--text-primary); }
+.btn-profile svg { width: 16px; height: 16px; }
+
 .btn-logout {
   padding: 0.4rem 1rem;
   font-size: 0.85rem;

@@ -1,6 +1,8 @@
 package com.team.blog.domain.user.service;
 
+import com.team.blog.domain.user.dto.UserInfoUpdateDto;
 import com.team.blog.domain.user.dto.UserJoinRequestDto;
+import com.team.blog.domain.user.dto.UserPwdUpdateDto;
 import com.team.blog.domain.user.entity.UserEntity;
 import com.team.blog.domain.user.repository.UserRepository;
 import com.team.blog.global.api.ErrorCode;
@@ -8,6 +10,7 @@ import com.team.blog.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

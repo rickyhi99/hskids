@@ -63,19 +63,19 @@ export default function UserBlog() {
     setNeighborLoading(true);
     try {
       if (neighborStatus === 'NONE') {
-        const res = await neighborApi.sendRequest(currentUser.id, Number(userId));
+        const res = await neighborApi.sendRequest(Number(userId));
         setNeighborStatus('PENDING_SENT');
         setNeighborId(res.data.id);
       } else if (neighborStatus === 'PENDING_SENT') {
-        await neighborApi.deleteNeighbor(currentUser.id, neighborId);
+        await neighborApi.deleteNeighbor(neighborId);
         setNeighborStatus('NONE');
         setNeighborId(null);
       } else if (neighborStatus === 'PENDING_RECEIVED') {
-        await neighborApi.updateStatus(currentUser.id, neighborId, 'ACCEPTED');
+        await neighborApi.updateStatus(neighborId, 'ACCEPTED');
         setNeighborStatus('ACCEPTED');
       } else if (neighborStatus === 'ACCEPTED') {
         if (!window.confirm('이웃을 끊으시겠습니까?')) return;
-        await neighborApi.deleteNeighbor(currentUser.id, neighborId);
+        await neighborApi.deleteNeighbor(neighborId);
         setNeighborStatus('NONE');
         setNeighborId(null);
       }

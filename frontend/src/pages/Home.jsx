@@ -239,7 +239,7 @@ export default function Home() {
     fetched.current.neighbor = true;
     setLoading((l) => ({ ...l, neighbor: true }));
     try {
-      const neighborsRes = await neighborApi.getNeighbors(currentUser.id);
+      const neighborsRes = await neighborApi.getNeighbors();
       const neighbors = neighborsRes.data ?? [];
       const postArrays = await Promise.all(
         neighbors.map((n) =>
@@ -277,8 +277,8 @@ export default function Home() {
     setNeighborMgmtLoading(true);
     try {
       const [neighborsRes, requestsRes] = await Promise.all([
-        neighborApi.getNeighbors(currentUser.id),
-        neighborApi.getReceivedRequests(currentUser.id),
+        neighborApi.getNeighbors(),
+        neighborApi.getReceivedRequests(),
       ]);
       setNeighbors(neighborsRes.data ?? []);
       setPendingRequests(requestsRes.data ?? []);
@@ -302,24 +302,24 @@ export default function Home() {
 
   const handleAcceptRequest = useCallback(async (neighborId, fromUserId) => {
     try {
-      await neighborApi.updateStatus(currentUser.id, neighborId, 'ACCEPTED');
+      await neighborApi.updateStatus(neighborId, 'ACCEPTED');
       setPendingRequests((prev) => prev.filter((r) => r.id !== neighborId));
       neighborFetched.current = false;
       await fetchNeighborMgmt();
     } catch (e) { alert(e.message || '오류가 발생했습니다.'); }
-  }, [currentUser, fetchNeighborMgmt]);
+  }, [fetchNeighborMgmt]);
 
   const handleRejectRequest = useCallback(async (neighborId) => {
     try {
-      await neighborApi.updateStatus(currentUser.id, neighborId, 'REJECTED');
+      await neighborApi.updateStatus(neighborId, 'REJECTED');
       setPendingRequests((prev) => prev.filter((r) => r.id !== neighborId));
     } catch (e) { alert(e.message || '오류가 발생했습니다.'); }
-  }, [currentUser]);
+  }, []);
 
   const handleDeleteNeighbor = useCallback(async (neighborId) => {
     if (!window.confirm('이웃을 끊으시겠습니까?')) return;
     try {
-      await neighborApi.deleteNeighbor(currentUser.id, neighborId);
+      await neighborApi.deleteNeighbor(neighborId);
       setNeighbors((prev) => prev.filter((n) => n.id !== neighborId));
     } catch (e) { alert(e.message || '오류가 발생했습니다.'); }
   }, [currentUser]);
@@ -407,6 +407,12 @@ export default function Home() {
           <span className="home-welcome">{currentUser?.nickname}님 환영합니다</span>
           <button className="btn-theme" onClick={toggleTheme} title={dark ? '라이트 모드' : '다크 모드'}>
             {dark ? '☀️' : '🌙'}
+          </button>
+          <button className="btn-profile" onClick={() => navigate('/profile')} title="개인정보 수정">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
           </button>
           <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
         </div>

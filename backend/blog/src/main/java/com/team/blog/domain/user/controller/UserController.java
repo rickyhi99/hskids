@@ -1,12 +1,16 @@
 package com.team.blog.domain.user.controller;
 
+import com.team.blog.domain.user.dto.UserInfoUpdateDto;
 import com.team.blog.domain.user.dto.UserJoinRequestDto;
+import com.team.blog.domain.user.dto.UserMeResponse;
+import com.team.blog.domain.user.dto.UserPwdUpdateDto;
 import com.team.blog.domain.user.service.UserService;
 import com.team.blog.global.api.ApiResponse;
 import com.team.blog.global.api.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
