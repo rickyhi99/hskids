@@ -4,7 +4,10 @@ import com.team.blog.domain.board.dto.request.PostCreateRequest;
 import com.team.blog.domain.board.dto.request.PostUpdateRequest;
 import com.team.blog.domain.board.dto.response.PostResponse;
 import com.team.blog.domain.board.service.PostService;
+import com.team.blog.global.api.ApiResponse;
+import com.team.blog.global.api.SuccessCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,53 +20,59 @@ public class PostController {
 
     private final PostService postService;
 
-    // TODO: 인증 구현 시 실제 로그인 유저 ID로 교체
-    private static final Long TEMP_USER_ID = 1L;
-
     @PostMapping
-    public ResponseEntity<PostResponse> create(@RequestBody PostCreateRequest request) {
-        PostResponse response = postService.create(TEMP_USER_ID, request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<PostResponse>> create(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody PostCreateRequest request) {
+        PostResponse response = postService.create(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(SuccessCode.SUCCESS_CREATED, response));
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostResponse> update(
+    public ResponseEntity<ApiResponse<PostResponse>> update(
+            @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long postId,
             @RequestBody PostUpdateRequest request) {
-        PostResponse response = postService.update(TEMP_USER_ID, postId, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(postService.update(userId, postId, request)));
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> delete(@PathVariable Long postId) {
-        postService.delete(TEMP_USER_ID, postId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @RequestHeader("X-User-Id") Long userId,
+            @PathVariable Long postId) {
+        postService.delete(userId, postId);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAll() {
-        return ResponseEntity.ok(postService.getAll());
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getAll() {
+        return ResponseEntity.ok(ApiResponse.success(postService.getAll()));
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<PostResponse>> getPopular() {
-        return ResponseEntity.ok(postService.getPopular());
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getPopular() {
+        return ResponseEntity.ok(ApiResponse.success(postService.getPopular()));
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponse> getOne(@PathVariable Long postId) {
-        return ResponseEntity.ok(postService.getOne(postId));
+    public ResponseEntity<ApiResponse<PostResponse>> getOne(@PathVariable Long postId) {
+        return ResponseEntity.ok(ApiResponse.success(postService.getOne(postId)));
     }
 
     @PostMapping("/{postId}/like")
-    public ResponseEntity<Void> like(@PathVariable Long postId) {
-        postService.like(TEMP_USER_ID, postId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<Void>> like(
+            @RequestHeader("X-User-Id") Long userId,
+            @PathVariable Long postId) {
+        postService.like(userId, postId);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @DeleteMapping("/{postId}/like")
-    public ResponseEntity<Void> unlike(@PathVariable Long postId) {
-        postService.unlike(TEMP_USER_ID, postId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<Void>> unlike(
+            @RequestHeader("X-User-Id") Long userId,
+            @PathVariable Long postId) {
+        postService.unlike(userId, postId);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 }
