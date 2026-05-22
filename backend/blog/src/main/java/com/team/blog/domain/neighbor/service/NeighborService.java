@@ -4,6 +4,7 @@ import com.team.blog.domain.neighbor.dto.request.NeighborRequest;
 import com.team.blog.domain.neighbor.dto.request.NeighborUpdateRequest;
 import com.team.blog.domain.neighbor.dto.response.NeighborDetailResponse;
 import com.team.blog.domain.neighbor.dto.response.NeighborRequestResponse;
+import com.team.blog.domain.neighbor.dto.response.NeighborStatusResponse;
 import com.team.blog.domain.neighbor.dto.response.NeighborUserResponse;
 import com.team.blog.domain.neighbor.entity.Neighbor;
 import com.team.blog.domain.neighbor.entity.NeighborStatus;
@@ -126,6 +127,32 @@ public class NeighborService {
                     return NeighborUserResponse.of(neighbor.getId(), otherUserEntity);
                 })
                 .toList();
+    }
+
+    /**
+     * 두 유저 사이의 이웃 관계 상태 조회
+     *
+     * @param myId       현재 유저 id
+     * @param targetId   상대 유저 id
+     * @return 관계 상태 (NONE / PENDING_SENT / PENDING_RECEIVED / ACCEPTED)
+     */
+    @Transactional(readOnly = true)
+    public NeighborStatusResponse getStatusWith(Long myId, Long targetId) {
+        // 내가 보낸 요청
+        var sent = neighborRepository.findByFromUserIdAndToUserId(myId, targetId);
+        if (sent.isPresent()) {
+            Neighbor n = sent.get();
+            String status = n.getStatus() == NeighborStatus.ACCEPTED ? "ACCEPTED" : "PENDING_SENT";
+            return new NeighborStatusResponse(status, n.getId());
+        }
+        // 상대가 보낸 요청
+        var received = neighborRepository.findByFromUserIdAndToUserId(targetId, myId);
+        if (received.isPresent()) {
+            Neighbor n = received.get();
+            String status = n.getStatus() == NeighborStatus.ACCEPTED ? "ACCEPTED" : "PENDING_RECEIVED";
+            return new NeighborStatusResponse(status, n.getId());
+        }
+        return new NeighborStatusResponse("NONE", null);
     }
 
     /**

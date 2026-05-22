@@ -4,6 +4,7 @@ import com.team.blog.domain.neighbor.dto.request.NeighborRequest;
 import com.team.blog.domain.neighbor.dto.request.NeighborUpdateRequest;
 import com.team.blog.domain.neighbor.dto.response.NeighborDetailResponse;
 import com.team.blog.domain.neighbor.dto.response.NeighborRequestResponse;
+import com.team.blog.domain.neighbor.dto.response.NeighborStatusResponse;
 import com.team.blog.domain.neighbor.dto.response.NeighborUserResponse;
 import com.team.blog.domain.neighbor.service.NeighborService;
 import com.team.blog.global.api.ApiResponse;
@@ -80,6 +81,16 @@ public class NeighborController {
     public ResponseEntity<ApiResponse<List<NeighborUserResponse>>> getNeighbors(
             Authentication authentication) {
         return ResponseEntity.ok(ApiResponse.success(neighborService.getNeighbors(authentication.getName())));
+    }
+
+    /**
+     * 특정 유저와의 이웃 관계 상태 조회
+     */
+    @GetMapping("/status/{targetUserId}")
+    public ResponseEntity<ApiResponse<NeighborStatusResponse>> getStatus(
+            @RequestHeader("X-User-Id") Long userId,
+            @PathVariable Long targetUserId) {
+        return ResponseEntity.ok(ApiResponse.success(neighborService.getStatusWith(userId, targetUserId)));
     }
 
     /**

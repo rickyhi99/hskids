@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +84,12 @@ public class PostService {
         return postRepository.findAllByUserIdAndVisibilityOrderByCreatedAtDesc(userId, Visibility.PUBLIC).stream()
                 .map(p -> new PostResponse(p, getNickname(p.getUserId())))
                 .toList();
+    }
+
+    public Set<Long> getLikedPostIds(Long userId) {
+        return postLikeRepository.findAllByUserId(userId).stream()
+                .map(PostLike::getPostId)
+                .collect(Collectors.toSet());
     }
 
     @Transactional

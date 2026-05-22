@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -64,6 +65,12 @@ public class PostController {
     public ResponseEntity<ApiResponse<List<PostResponse>>> getMyPosts(
             @RequestHeader("X-User-Id") Long userId) {
         return ResponseEntity.ok(ApiResponse.success(postService.getMyPosts(userId)));
+    }
+
+    @GetMapping("/liked")
+    public ResponseEntity<ApiResponse<Set<Long>>> getLikedPostIds(
+            @RequestHeader("X-User-Id") Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(postService.getLikedPostIds(userId)));
     }
 
     @GetMapping("/users/{userId}")
