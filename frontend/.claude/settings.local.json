@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(grep -n \"color\\\\|background\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\\\\|rgba\" /c/Users/student/Desktop/ricky/kbhealthFront/src/components/feed/Post.vue)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(npm install *)",
+      "Bash(npm list *)"
     ]
   }
 }

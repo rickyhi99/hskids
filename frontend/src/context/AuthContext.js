@@ -1,36 +1,86 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import * as userApi from '../api/userApi';
 
 const AuthContext = createContext(null);
 
-// 목 데이터: 허용된 계정 목록
-const MOCK_USERS = [
-  { id: 1, account: 'admin', password: '1234', name: '관리자' },
-  { id: 2, account: 'user1', password: '1234', name: '홍길동' },
-  { id: 3, account: 'test', password: 'test', name: '테스터' },
-];
+const parseJwt = (token) => {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(window.atob(base64));
+  } catch {
+    return null;
+  }
+};
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
 
-  // 자격증명만 검증, 상태는 변경하지 않음
-  const validate = (account, password) => {
-    const found = MOCK_USERS.find(
-      (u) => u.account === account && u.password === password
-    );
-    if (found) {
-      const { password: _, ...user } = found;
-      return { success: true, user };
-    }
-    return { success: false };
+  useEffect(() => {
+    const restore = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) { setAuthReady(true); return; }
+      const payload = parseJwt(token);
+      if (!payload || payload.exp * 1000 <= Date.now()) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setAuthReady(true);
+        return;
+      }
+      try {
+        const res = await userApi.getMe(token);
+        setCurrentUser({ ...res.data, role: payload.role });
+      } catch {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      } finally {
+        setAuthReady(true);
+      }
+    };
+    restore();
+  }, []);
+
+  // 자격증명 검증 → 토큰 저장 → 유저 정보 반환
+  const validate = async (id, password) => {
+    const loginRes = await userApi.login(id, password);
+    const { accessToken, refreshToken } = loginRes.data;
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    const payload = parseJwt(accessToken);
+    const meRes = await userApi.getMe(accessToken);
+    return { ...meRes.data, role: payload.role };
   };
 
   // 애니메이션 완료 후 실제 로그인 상태 확정
   const confirmLogin = (user) => setCurrentUser(user);
 
-  const logout = () => setCurrentUser(null);
+  const logout = async () => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      if (token) await userApi.logout(token);
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setCurrentUser(null);
+    }
+  };
+
+  const refreshSession = async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) throw new Error('refresh token 없음');
+    const res = await userApi.refreshTokens(refreshToken);
+    const { accessToken, refreshToken: newRefresh } = res.data;
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', newRefresh);
+    const payload = parseJwt(accessToken);
+    const meRes = await userApi.getMe(accessToken);
+    const user = { ...meRes.data, role: payload.role };
+    setCurrentUser(user);
+    return accessToken;
+  };
 
   return (
-    <AuthContext.Provider value={{ currentUser, validate, confirmLogin, logout }}>
+    <AuthContext.Provider value={{ currentUser, authReady, validate, confirmLogin, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

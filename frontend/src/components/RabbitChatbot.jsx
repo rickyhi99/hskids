@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './RabbitChatbot.css';
 
 const MAX_FRAMES = 112;
@@ -37,7 +37,7 @@ export default function RabbitChatbot() {
   const typeTimerRef = useRef(null);
   const contentRef = useRef(null);
 
-  const animateRabbit = () => {
+  const animateRabbit = useCallback(() => {
     clearInterval(animTimerRef.current);
     let f = 1;
     animTimerRef.current = setInterval(() => {
@@ -47,9 +47,9 @@ export default function RabbitChatbot() {
         clearInterval(animTimerRef.current);
       }
     }, ANIMATION_SPEED);
-  };
+  }, []);
 
-  const typeMessage = (msg, afterDone) => {
+  const typeMessage = useCallback((msg, afterDone) => {
     clearInterval(typeTimerRef.current);
     setDisplayedMsg('');
     setShowOptions(false);
@@ -68,10 +68,11 @@ export default function RabbitChatbot() {
         afterDone?.();
       }
     }, TYPING_SPEED);
-  };
+  }, [animateRabbit]);
 
+  // open이 true가 될 때 phase는 항상 'initial'(handleOpen에서 같이 세팅)
   useEffect(() => {
-    if (open && phase === 'initial') {
+    if (open) {
       typeMessage(INITIAL_MESSAGE, () => {
         setTimeout(() => setShowOptions(true), 400);
       });
@@ -80,7 +81,7 @@ export default function RabbitChatbot() {
       clearInterval(animTimerRef.current);
       clearInterval(typeTimerRef.current);
     };
-  }, [open]);
+  }, [open, typeMessage]);
 
   const handleOption = (opt) => {
     setPhase('answered');
