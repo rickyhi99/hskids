@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useTheme from '../hooks/useTheme';
 import RabbitChatbot from '../components/RabbitChatbot';
+import RainScene from '../components/RainScene';
+import Golconda from '../components/Golconda';
+import Pinwheel from '../components/Pinwheel';
+
 import * as postApi from '../api/postApi';
 import * as neighborApi from '../api/neighborApi';
 import * as categoryApi from '../api/categoryApi';
@@ -196,6 +200,35 @@ export default function Home() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [dark, toggleTheme] = useTheme();
+  const [rainActive, setRainActive] = useState(false);
+  const [golcondaActive, setGolcondaActive] = useState(false);
+  const logoClickRef = useRef({ count: 0, timer: null });
+  const themeClickRef = useRef({ count: 0, timer: null });
+
+  const handleLogoClick = useCallback(() => {
+    const state = logoClickRef.current;
+    state.count += 1;
+    clearTimeout(state.timer);
+    if (state.count >= 3) {
+      state.count = 0;
+      setRainActive(true);
+    } else {
+      state.timer = setTimeout(() => { state.count = 0; }, 1500);
+    }
+  }, []);
+
+  const handleThemeClick = useCallback(() => {
+    toggleTheme();
+    const state = themeClickRef.current;
+    state.count += 1;
+    clearTimeout(state.timer);
+    if (state.count >= 3) {
+      state.count = 0;
+      setGolcondaActive(true);
+    } else {
+      state.timer = setTimeout(() => { state.count = 0; }, 1500);
+    }
+  }, [toggleTheme]);
 
   const [activeTab, setActiveTab] = useState('feed');
   const [feedSubTab, setFeedSubTab] = useState('all');
@@ -411,10 +444,13 @@ export default function Home() {
   return (
     <div className="home-page">
       <header className="home-header">
-        <h1 className="home-logo">BLOG</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <h1 className="home-logo" onClick={handleLogoClick} style={{ cursor: 'default', userSelect: 'none' }}>BLOG</h1>
+          {dark && <Pinwheel />}
+        </div>
         <div className="home-header-right">
           <span className="home-welcome">{currentUser?.nickname}님 환영합니다</span>
-          <button className="btn-theme" onClick={toggleTheme} title={dark ? '라이트 모드' : '다크 모드'}>
+          <button className="btn-theme" onClick={handleThemeClick} title={dark ? '라이트 모드' : '다크 모드'}>
             {dark ? '☀️' : '🌙'}
           </button>
           <button className="btn-profile" onClick={() => navigate('/profile')} title="개인정보 수정">
@@ -628,6 +664,9 @@ export default function Home() {
       </main>
 
       <RabbitChatbot />
+
+      {rainActive && <RainScene onClose={() => setRainActive(false)} />}
+      {golcondaActive && <Golconda onClose={() => setGolcondaActive(false)} />}
 
       <button className="btn-write" onClick={() => navigate('/write')} aria-label="글쓰기">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

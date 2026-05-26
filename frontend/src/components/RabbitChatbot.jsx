@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import * as postApi from '../api/postApi';
+import * as categoryApi from '../api/categoryApi';
 import './RabbitChatbot.css';
 
 const MAX_FRAMES = 112;
@@ -9,28 +12,30 @@ const INITIAL_MESSAGE = '안녕하세요! 블로그에 오신 걸 환영해요 �
 
 const OPTIONS = [
   {
+    id: 'write',
     label: '글 쓰는 법이 궁금해요',
     response:
-      '상단의 녹색 ✏️ 글쓰기 버튼을 누르면 바로 작성할 수 있어요!\n제목, 카테고리, 내용을 입력하고 대표 이미지도 첨부할 수 있답니다.\n공개 범위도 전체 공개 / 팔로워만 / 비공개 중에 고를 수 있어요.',
+      '상단의 녹색 ✏️ 글쓰기 버튼을 누르면 바로 작성할 수 있어요!\n제목, 카테고리, 내용을 입력하고 대표 이미지도 첨부할 수 있답니다.\n공개 범위도 전체 공개 / 이웃만 / 비공개 중에 고를 수 있어요.',
   },
   {
+    id: 'categories',
     label: '어떤 카테고리가 있나요?',
-    response:
-      '현재 블로그에는 이런 카테고리들이 있어요!\n\n• React  • CSS  • TypeScript\n• Git  • 성능  • 개발 문화  • 일상\n\n관심 있는 태그의 글들을 모아볼 수 있어요 📚',
+    response: null,
   },
   {
+    id: 'popular',
     label: '인기 글 보러가기',
-    response:
-      '지금 가장 인기 있는 글이에요 🔥\n\n1. CSS Grid vs Flexbox — 좋아요 203개\n2. Git 브랜치 전략 — 좋아요 176개\n3. 리액트로 블로그 만들기 — 좋아요 142개\n\n목록에서 바로 확인해보세요!',
+    response: null,
   },
 ];
 
 export default function RabbitChatbot() {
+  const { currentUser } = useAuth();
   const [open, setOpen] = useState(false);
   const [frame, setFrame] = useState(1);
   const [displayedMsg, setDisplayedMsg] = useState('');
   const [showOptions, setShowOptions] = useState(false);
-  const [phase, setPhase] = useState('initial'); // 'initial' | 'answered'
+  const [phase, setPhase] = useState('initial');
 
   const isTypingRef = useRef(false);
   const animTimerRef = useRef(null);
@@ -70,7 +75,6 @@ export default function RabbitChatbot() {
     }, TYPING_SPEED);
   }, [animateRabbit]);
 
-  // open이 true가 될 때 phase는 항상 'initial'(handleOpen에서 같이 세팅)
   useEffect(() => {
     if (open) {
       typeMessage(INITIAL_MESSAGE, () => {
@@ -83,12 +87,50 @@ export default function RabbitChatbot() {
     };
   }, [open, typeMessage]);
 
-  const handleOption = (opt) => {
+  const fetchResponse = useCallback(async (opt) => {
+    if (opt.id === 'categories') {
+      try {
+        const res = await categoryApi.getCategories(currentUser.id);
+        const cats = (res.data ?? []).filter((c) => !c.parentId);
+        if (cats.length === 0) {
+          return '아직 카테고리가 없어요.\n내 블로그 탭에서 카테고리를 직접 만들 수 있어요! 📁';
+        }
+        const list = cats.map((c) => `• ${c.name}`).join('\n');
+        return `현재 블로그에는 이런 카테고리들이 있어요!\n\n${list}\n\n내 블로그 탭에서 카테고리별로 모아볼 수 있어요 📚`;
+      } catch {
+        return '카테고리 정보를 불러오지 못했어요 😢\n잠시 후 다시 시도해주세요.';
+      }
+    }
+
+    if (opt.id === 'popular') {
+      try {
+        const res = await postApi.getAllPosts();
+        const posts = (res.data ?? [])
+          .sort((a, b) => b.likeCount - a.likeCount)
+          .slice(0, 3);
+        if (posts.length === 0) {
+          return '아직 게시글이 없어요.\n첫 번째 글을 작성해볼까요? ✍️';
+        }
+        const list = posts
+          .map((p, i) => `${i + 1}. ${p.title} — ❤️ ${p.likeCount}`)
+          .join('\n');
+        return `지금 가장 인기 있는 글이에요 🔥\n\n${list}\n\n목록에서 바로 확인해보세요!`;
+      } catch {
+        return '인기 글 정보를 불러오지 못했어요 😢\n잠시 후 다시 시도해주세요.';
+      }
+    }
+
+    return opt.response;
+  }, [currentUser]);
+
+  const handleOption = useCallback(async (opt) => {
     setPhase('answered');
-    typeMessage(opt.response, () => {
+    typeMessage('잠깐만요, 불러올게요! 🐾', null);
+    const response = await fetchResponse(opt);
+    typeMessage(response, () => {
       setTimeout(() => setShowOptions(true), 400);
     });
-  };
+  }, [typeMessage, fetchResponse]);
 
   const handleRetry = () => {
     setPhase('initial');
@@ -115,7 +157,6 @@ export default function RabbitChatbot() {
 
   return (
     <>
-      {/* 플로팅 버튼 */}
       {!open && (
         <button
           className="rabbit-toggle-btn"
@@ -131,7 +172,6 @@ export default function RabbitChatbot() {
         </button>
       )}
 
-      {/* 챗봇 패널 */}
       {open && (
         <div className="rabbit-panel">
           <div className="rabbit-avatar">
