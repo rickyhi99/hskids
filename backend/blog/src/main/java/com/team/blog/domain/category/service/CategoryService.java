@@ -75,8 +75,13 @@ public class CategoryService {
             throw new ApiException(ErrorCode.CATEGORY_FORBIDDEN);
         }
 
+        List<Category> children = categoryRepository.findByParentId(categoryId);
+        for (Category child : children) {
+            postRepository.clearCategoryId(child.getId());
+            categoryRepository.delete(child);
+        }
+
         postRepository.clearCategoryId(categoryId);
-        categoryRepository.clearParentId(categoryId);
         categoryRepository.delete(category);
     }
 
