@@ -1,14 +1,19 @@
 package com.team.blog.domain.user.controller;
 
+import com.team.blog.domain.user.dto.UserInfoUpdateDto;
 import com.team.blog.domain.user.dto.UserJoinRequestDto;
+import com.team.blog.domain.user.dto.UserMeResponse;
+import com.team.blog.domain.user.dto.UserProfileImgDto;
+import com.team.blog.domain.user.dto.UserPublicResponse;
+import com.team.blog.domain.user.dto.UserPwdUpdateDto;
 import com.team.blog.domain.user.service.UserService;
 import com.team.blog.global.api.ApiResponse;
 import com.team.blog.global.api.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,26 +23,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/join")
-    // 공통 ApiResponse 형식 반환
     public ResponseEntity<ApiResponse<Void>> join(@RequestBody UserJoinRequestDto dto) {
         userService.join(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SuccessCode.SUCCESS_CREATED));
     }
 
-    // ?id=xxx 로 들어올 때
     @GetMapping(value = "/check", params = "id")
     public ResponseEntity<ApiResponse<Boolean>> checkId(@RequestParam String id) {
         return ResponseEntity.ok(ApiResponse.success(userService.existsById(id)));
     }
 
-    // ?email=xxx 로 들어올 때
     @GetMapping(value = "/check", params = "email")
     public ResponseEntity<ApiResponse<Boolean>> checkEmail(@RequestParam String email) {
         return ResponseEntity.ok(ApiResponse.success(userService.existsByEmail(email)));
     }
 
-    // ?nickname=xxx 로 들어올 때
     @GetMapping(value = "/check", params = "nickname")
     public ResponseEntity<ApiResponse<Boolean>> checkNickname(@RequestParam String nickname) {
         return ResponseEntity.ok(ApiResponse.success(userService.existsByNickname(nickname)));
@@ -56,10 +57,22 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.SUCCESS_OK));
     }
 
+    @PatchMapping("/me/profile-image")
+    public ResponseEntity<ApiResponse<Void>> updateProfileImg(Authentication auth,
+                                                              @RequestBody UserProfileImgDto dto) {
+        userService.updateProfileImg(auth.getName(), dto.getProfileImg());
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.SUCCESS_OK));
+    }
+
     @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> withdraw(Authentication auth) {
         userService.withdraw(auth.getName());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.SUCCESS_OK));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<UserPublicResponse>> getUserById(@PathVariable Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(new UserPublicResponse(userService.findById(userId))));
     }
 
     @GetMapping("/me")

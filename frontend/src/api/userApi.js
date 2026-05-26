@@ -39,3 +39,21 @@ export const checkId = (id) =>
 
 export const checkEmail = (email) =>
   request('GET', `/api/users/check?email=${encodeURIComponent(email)}`);
+
+export const checkNickname = (nickname) =>
+  request('GET', `/api/users/check?nickname=${encodeURIComponent(nickname)}`);
+
+export const updateInfo = (body) =>
+  request('PUT', '/api/users/me', { body, token: localStorage.getItem('accessToken') });
+
+export const updateProfileImg = (profileImg) =>
+  request('PATCH', '/api/users/me/profile-image', {
+    body: { profileImg },
+    token: localStorage.getItem('accessToken'),
+  });
+
+export const withdraw = () =>
+  request('DELETE', '/api/users/me', { token: localStorage.getItem('accessToken') });
+
+export const getUserInfo = (userId) =>
+  request('GET', `/api/users/${userId}`);

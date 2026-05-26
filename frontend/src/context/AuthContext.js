@@ -79,8 +79,16 @@ export function AuthProvider({ children }) {
     return accessToken;
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+    const res = await userApi.getMe(token);
+    const payload = parseJwt(token);
+    setCurrentUser({ ...res.data, role: payload?.role });
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, authReady, validate, confirmLogin, logout, refreshSession }}>
+    <AuthContext.Provider value={{ currentUser, authReady, validate, confirmLogin, logout, refreshSession, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

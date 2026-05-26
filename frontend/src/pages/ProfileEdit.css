@@ -1,0 +1,223 @@
+.profile-page {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ── 헤더 ── */
+.profile-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  height: 56px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+.profile-back:hover { background: var(--border-light); color: var(--text-primary); }
+.profile-back svg { width: 18px; height: 18px; }
+
+.profile-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ── 메인 ── */
+.profile-main {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── 공통 카드 ── */
+.profile-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── 현재 정보 카드 ── */
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.profile-avatar-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.profile-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.profile-avatar-wrap:hover .profile-avatar-overlay,
+.profile-avatar-overlay.uploading {
+  opacity: 1;
+}
+
+.info-nickname {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+.info-id {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0 0 2px;
+}
+.info-email {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── 섹션 제목 ── */
+.profile-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+}
+
+/* ── 필드 ── */
+.profile-field {
+  margin-bottom: 1rem;
+}
+.profile-field:last-of-type { margin-bottom: 1.25rem; }
+
+.profile-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.required { color: #ef4444; margin-left: 2px; }
+.optional { color: var(--text-secondary); font-weight: 400; margin-left: 3px; }
+
+.profile-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-md);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.profile-input:focus { outline: none; border-color: var(--accent); }
+.profile-input.input-error { border-color: #ef4444; }
+
+.profile-val-msg {
+  font-size: 0.78rem;
+  margin: 4px 0 0;
+}
+.profile-val-msg.success { color: var(--accent); }
+.profile-val-msg.error   { color: #ef4444; }
+.profile-val-msg.checking { color: var(--text-secondary); }
+
+.profile-divider {
+  border: none;
+  border-top: 1px solid var(--border-md);
+  margin: 0.5rem 0 1rem;
+}
+
+.btn-profile-save {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-profile-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── 탈퇴 카드 ── */
+.danger-card { border: 1.5px solid #fca5a5; }
+.danger-title { color: #ef4444; }
+.danger-desc {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.btn-withdraw {
+  padding: 9px 20px;
+  background: none;
+  border: 1.5px solid #ef4444;
+  border-radius: 10px;
+  color: #ef4444;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-withdraw:hover { background: #fef2f2; }
+.btn-withdraw:disabled { opacity: 0.5; cursor: not-allowed; }
