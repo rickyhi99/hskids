@@ -4,6 +4,7 @@ import { marked } from 'marked';
 import { useAuth } from '../context/AuthContext';
 import * as postApi from '../api/postApi';
 import * as commentApi from '../api/commentApi';
+import Avatar from '../components/Avatar';
 import './PostDetail.css';
 
 marked.setOptions({ breaks: true, gfm: true });
@@ -174,7 +175,7 @@ export default function PostDetail() {
               className={`detail-author${post.userId !== currentUser?.id ? ' clickable' : ''}`}
               onClick={goToAuthorBlog}
             >
-              <div className="detail-avatar">{post.nickname?.[0] ?? '?'}</div>
+              <Avatar profileImg={post.profileImg} nickname={post.nickname} className="detail-avatar" />
               <div>
                 <span className="detail-author-name">{post.nickname ?? '알 수 없음'}</span>
                 <span className="detail-date">{formatDate(post.createdAt)}</span>
@@ -214,7 +215,7 @@ export default function PostDetail() {
               {comments.map((c) => (
                 <li key={c.id} className="comment-item">
                   <div className="comment-header">
-                    <div className="comment-avatar">{c.nickname?.[0] ?? '?'}</div>
+                    <Avatar profileImg={c.profileImg} nickname={c.nickname} className="comment-avatar" />
                     <span className="comment-author">{c.nickname ?? '알 수 없음'}</span>
                     <span className="comment-date">{formatDate(c.createdAt)}</span>
                     {c.userId === currentUser?.id && editingId !== c.id && (

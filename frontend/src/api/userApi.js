@@ -46,5 +46,14 @@ export const checkNickname = (nickname) =>
 export const updateInfo = (body) =>
   request('PUT', '/api/users/me', { body, token: localStorage.getItem('accessToken') });
 
+export const updateProfileImg = (profileImg) =>
+  request('PATCH', '/api/users/me/profile-image', {
+    body: { profileImg },
+    token: localStorage.getItem('accessToken'),
+  });
+
 export const withdraw = () =>
   request('DELETE', '/api/users/me', { token: localStorage.getItem('accessToken') });
+
+export const getUserInfo = (userId) =>
+  request('GET', `/api/users/${userId}`);

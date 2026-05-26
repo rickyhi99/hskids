@@ -2,7 +2,10 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as userApi from '../api/userApi';
+import { uploadFile } from '../api/http';
 import './ProfileEdit.css';
+
+const BASE_URL = 'http://localhost:8081';
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
@@ -18,6 +21,29 @@ export default function ProfileEdit() {
 
   const [submitting, setSubmitting] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
+
+  const imgInputRef = useRef(null);
+  const [imgUploading, setImgUploading] = useState(false);
+
+  const profileImgUrl = currentUser?.profileImg
+    ? (currentUser.profileImg.startsWith('http') ? currentUser.profileImg : `${BASE_URL}${currentUser.profileImg}`)
+    : null;
+
+  const handleImgChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImgUploading(true);
+    try {
+      const res = await uploadFile('/api/upload/image', file);
+      await userApi.updateProfileImg(res.data.url);
+      await refreshUser();
+    } catch (err) {
+      alert(err.message || '이미지 업로드에 실패했습니다.');
+    } finally {
+      setImgUploading(false);
+      if (imgInputRef.current) imgInputRef.current.value = '';
+    }
+  };
 
   // ── 닉네임 중복 확인 ─────────────────────────────────────────
   const checkNickname = async (value) => {
@@ -113,7 +139,23 @@ export default function ProfileEdit() {
 
         {/* 현재 정보 */}
         <div className="profile-card info-card">
-          <div className="profile-avatar-lg">{currentUser?.nickname?.[0] ?? '?'}</div>
+          <div className="profile-avatar-wrap" onClick={() => !imgUploading && imgInputRef.current?.click()} title="프로필 사진 변경">
+            <input
+              type="file"
+              accept="image/*"
+              ref={imgInputRef}
+              style={{ display: 'none' }}
+              onChange={handleImgChange}
+            />
+            {profileImgUrl ? (
+              <img src={profileImgUrl} alt="프로필" className="profile-avatar-img" />
+            ) : (
+              <div className="profile-avatar-lg">{currentUser?.nickname?.[0] ?? '?'}</div>
+            )}
+            <div className={`profile-avatar-overlay${imgUploading ? ' uploading' : ''}`}>
+              {imgUploading ? '...' : '📷'}
+            </div>
+          </div>
           <div>
             <p className="info-nickname">{currentUser?.nickname}</p>
             <p className="info-id">@{currentUser?.loginId}</p>

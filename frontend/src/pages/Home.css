@@ -491,6 +491,32 @@
   }
 }
 
+/* ── 카테고리 수 뱃지 (내 블로그 탭) ── */
+.cat-count-sm {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-faint);
+  background: var(--chip-bg);
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin-left: 4px;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+.main-tab.active .cat-count-sm {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent-text);
+}
+
+.my-subcat-bar {
+  background: var(--surface-subtle);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
 /* ── 탭 뱃지 ── */
 .tab-badge {
   display: inline-flex;

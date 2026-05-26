@@ -92,6 +92,13 @@ public class UserService {
     }
 
     @Transactional
+    public void updateProfileImg(String loginId, String profileImg) {
+        UserEntity user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+        user.setProfileImg(profileImg);
+    }
+
+    @Transactional
     public void withdraw(String loginId) {
         UserEntity user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -100,6 +107,11 @@ public class UserService {
 
     public UserEntity findByLoginId(String loginId) {
         return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
     }
 }

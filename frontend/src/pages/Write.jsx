@@ -1,24 +1,15 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { marked } from 'marked';
 import { useAuth } from '../context/AuthContext';
 import * as postApi from '../api/postApi';
+import * as categoryApi from '../api/categoryApi';
 import { uploadFile } from '../api/http';
 import useTheme from '../hooks/useTheme';
 import RabbitChatbot from '../components/RabbitChatbot';
 import './Write.css';
 
 marked.setOptions({ breaks: true, gfm: true });
-
-const CATEGORIES = [
-  { id: 1, name: 'React' },
-  { id: 2, name: 'CSS' },
-  { id: 3, name: 'TypeScript' },
-  { id: 4, name: 'Git' },
-  { id: 5, name: '성능' },
-  { id: 6, name: '개발 문화' },
-  { id: 7, name: '일상' },
-];
 
 const VISIBILITY_OPTIONS = [
   { value: 'PUBLIC', label: '전체 공개' },
@@ -40,6 +31,14 @@ export default function Write() {
   const [dark, toggleTheme] = useTheme();
   const [editorMode, setEditorMode] = useState('split');
   const [submitting, setSubmitting] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    categoryApi.getCategories(currentUser.id)
+      .then((res) => setCategories(res.data ?? []))
+      .catch(() => setCategories([]));
+  }, [currentUser?.id]);
 
   // 수정 모드: navigate('/write', { state: { post } }) 로 진입
   const editPost = location.state?.post ?? null;
@@ -158,20 +157,34 @@ export default function Write() {
             <div className="section-divider" />
 
             <div className="write-section">
-              <span className="section-label">
-                카테고리 <span className="optional">선택</span>
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <span className="section-label" style={{ marginBottom: 0 }}>
+                  카테고리 <span className="optional">선택</span>
+                </span>
+                <button
+                  type="button"
+                  className="chip"
+                  style={{ fontSize: '0.78rem', padding: '3px 10px' }}
+                  onClick={() => navigate('/categories')}
+                >
+                  카테고리 관리
+                </button>
+              </div>
               <div className="chip-group">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    className={`chip ${form.categoryId === cat.id ? 'chip-active' : ''}`}
-                    onClick={() => setForm((prev) => ({ ...prev, categoryId: cat.id }))}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
+                {categories.length === 0 ? (
+                  <span className="optional" style={{ fontSize: '0.85rem' }}>등록된 카테고리가 없습니다</span>
+                ) : (
+                  categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      className={`chip ${Number(form.categoryId) === cat.id ? 'chip-active' : ''}`}
+                      onClick={() => setForm((prev) => ({ ...prev, categoryId: cat.id }))}
+                    >
+                      {cat.name}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
           </div>

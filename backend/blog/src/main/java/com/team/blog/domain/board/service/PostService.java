@@ -35,7 +35,7 @@ public class PostService {
     public PostResponse create(Long userId, PostCreateRequest request) {
         Post post = new Post(userId, request);
         postRepository.save(post);
-        return new PostResponse(post, getNickname(userId));
+        return toResponse(post);
     }
 
     @Transactional
@@ -43,7 +43,7 @@ public class PostService {
         Post post = getPostOrThrow(postId);
         validateOwner(post, userId);
         post.update(request);
-        return new PostResponse(post, getNickname(post.getUserId()));
+        return toResponse(post);
     }
 
     @Transactional
@@ -57,32 +57,29 @@ public class PostService {
 
     public List<PostResponse> getAll() {
         return postRepository.findAll().stream()
-                .map(p -> new PostResponse(p, getNickname(p.getUserId())))
+                .map(this::toResponse)
                 .toList();
     }
 
     public PostResponse getOne(Long postId) {
-        Post post = getPostOrThrow(postId);
-        return new PostResponse(post, getNickname(post.getUserId()));
+        return toResponse(getPostOrThrow(postId));
     }
 
     public List<PostResponse> getPopular() {
         return postRepository.findAllByVisibilityOrderByLikeCountDesc(Visibility.PUBLIC).stream()
-                .map(p -> new PostResponse(p, getNickname(p.getUserId())))
+                .map(this::toResponse)
                 .toList();
     }
 
-    // 내 블로그: 본인 글 전체 (visibility 무관)
     public List<PostResponse> getMyPosts(Long userId) {
         return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(p -> new PostResponse(p, getNickname(p.getUserId())))
+                .map(this::toResponse)
                 .toList();
     }
 
-    // 타인 블로그: PUBLIC 글만
     public List<PostResponse> getUserPosts(Long userId) {
         return postRepository.findAllByUserIdAndVisibilityOrderByCreatedAtDesc(userId, Visibility.PUBLIC).stream()
-                .map(p -> new PostResponse(p, getNickname(p.getUserId())))
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -111,6 +108,13 @@ public class PostService {
         post.decreaseLikeCount();
     }
 
+    private PostResponse toResponse(Post post) {
+        UserEntity user = userRepository.findById(post.getUserId()).orElse(null);
+        String nickname = user != null ? user.getNickname() : null;
+        String profileImg = user != null ? user.getProfileImg() : null;
+        return new PostResponse(post, nickname, profileImg);
+    }
+
     private Post getPostOrThrow(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new ApiException(ErrorCode.POST_NOT_FOUND));
@@ -120,11 +124,5 @@ public class PostService {
         if (!post.getUserId().equals(userId)) {
             throw new ApiException(ErrorCode.POST_FORBIDDEN);
         }
-    }
-
-    private String getNickname(Long userId) {
-        return userRepository.findById(userId)
-                .map(UserEntity::getNickname)
-                .orElse(null);
     }
 }

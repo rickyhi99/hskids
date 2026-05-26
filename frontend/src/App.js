@@ -6,6 +6,7 @@ import Write from './pages/Write';
 import PostDetail from './pages/PostDetail';
 import UserBlog from './pages/UserBlog';
 import ProfileEdit from './pages/ProfileEdit';
+import CategoryManage from './pages/CategoryManage';
 
 function PrivateRoute({ children }) {
   const { currentUser, authReady } = useAuth();
@@ -68,6 +69,14 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <ProfileEdit />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/categories"
+        element={
+          <PrivateRoute>
+            <CategoryManage />
           </PrivateRoute>
         }
       />

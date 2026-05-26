@@ -5,6 +5,8 @@ import useTheme from '../hooks/useTheme';
 import RabbitChatbot from '../components/RabbitChatbot';
 import * as postApi from '../api/postApi';
 import * as neighborApi from '../api/neighborApi';
+import * as categoryApi from '../api/categoryApi';
+import Avatar from '../components/Avatar';
 import './Home.css';
 
 const formatDate = (iso) => {
@@ -78,13 +80,13 @@ function PostCard({ post, showVisibility, liked, onLike, onUnlike, isOwner, onEd
 
           <div className="post-footer">
             <div className="post-author-row">
-              <div
+              <Avatar
+                profileImg={post.profileImg}
+                nickname={post.nickname}
                 className="post-author-avatar"
-                onClick={(e) => { e.stopPropagation(); onAuthorClick?.(); }}
                 style={onAuthorClick ? { cursor: 'pointer' } : {}}
-              >
-                {post.nickname?.[0] ?? '?'}
-              </div>
+                onClick={(e) => { e.stopPropagation(); onAuthorClick?.(); }}
+              />
               <div className="post-author-detail">
                 <span
                   className="post-author"
@@ -201,6 +203,9 @@ export default function Home() {
   const [allPosts, setAllPosts] = useState([]);
   const [neighborPosts, setNeighborPosts] = useState([]);
   const [myPosts, setMyPosts] = useState([]);
+  const [myCategories, setMyCategories] = useState([]);
+  const [myActiveCatId, setMyActiveCatId] = useState(null);
+  const [myActiveSubCatId, setMyActiveSubCatId] = useState(null);
   const [likedPosts, setLikedPosts] = useState(new Set());
 
   const [loading, setLoading] = useState({ all: false, neighbor: false, my: false });
@@ -262,8 +267,12 @@ export default function Home() {
     fetched.current.my = true;
     setLoading((l) => ({ ...l, my: true }));
     try {
-      const res = await postApi.getMyPosts(currentUser.id);
-      setMyPosts(res.data ?? []);
+      const [postsRes, catsRes] = await Promise.all([
+        postApi.getMyPosts(currentUser.id),
+        categoryApi.getCategories(currentUser.id),
+      ]);
+      setMyPosts(postsRes.data ?? []);
+      setMyCategories(catsRes.data ?? []);
     } catch {
       fetched.current.my = false;
     } finally {
@@ -470,7 +479,74 @@ export default function Home() {
           <PostGrid posts={neighborPosts} loading={loading.neighbor} emptyText="이웃이 없거나 이웃의 게시글이 없습니다." {...gridProps} />
         )}
         {activeTab === 'myblog' && (
-          <PostGrid posts={myPosts} loading={loading.my} emptyText="아직 작성한 글이 없습니다." showVisibility {...gridProps} />
+          <>
+            {!loading.my && myCategories.length > 0 && (() => {
+              const myTopLevel = myCategories.filter((c) => !c.parentId);
+              const mySubCats = myActiveCatId
+                ? myCategories.filter((c) => c.parentId === myActiveCatId)
+                : [];
+              const myCatCount = (catId) => {
+                const childIds = myCategories.filter((c) => c.parentId === catId).map((c) => c.id);
+                return myPosts.filter((p) => p.categoryId === catId || childIds.includes(p.categoryId)).length;
+              };
+              return (
+                <div className="my-cat-section">
+                  <div className="main-tabs" style={{ marginTop: '0.75rem' }}>
+                    <button
+                      className={`main-tab${!myActiveCatId ? ' active' : ''}`}
+                      onClick={() => { setMyActiveCatId(null); setMyActiveSubCatId(null); }}
+                    >
+                      전체 <span className="cat-count-sm">{myPosts.length}</span>
+                    </button>
+                    {myTopLevel.map((cat) => (
+                      <button
+                        key={cat.id}
+                        className={`main-tab${myActiveCatId === cat.id ? ' active' : ''}`}
+                        onClick={() => { setMyActiveCatId(cat.id); setMyActiveSubCatId(null); }}
+                      >
+                        {cat.name} <span className="cat-count-sm">{myCatCount(cat.id)}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {mySubCats.length > 0 && (
+                    <div className="feed-subtabs my-subcat-bar">
+                      <button
+                        className={`feed-subtab${!myActiveSubCatId ? ' active' : ''}`}
+                        onClick={() => setMyActiveSubCatId(null)}
+                      >
+                        전체
+                      </button>
+                      {mySubCats.map((sub) => (
+                        <button
+                          key={sub.id}
+                          className={`feed-subtab${myActiveSubCatId === sub.id ? ' active' : ''}`}
+                          onClick={() => setMyActiveSubCatId(sub.id)}
+                        >
+                          {sub.name}
+                          <span className="cat-count-sm">
+                            {myPosts.filter((p) => p.categoryId === sub.id).length}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+            <PostGrid
+              posts={(() => {
+                if (!myActiveCatId) return myPosts;
+                const mySubCats = myCategories.filter((c) => c.parentId === myActiveCatId);
+                if (myActiveSubCatId) return myPosts.filter((p) => p.categoryId === myActiveSubCatId);
+                const childIds = mySubCats.map((c) => c.id);
+                return myPosts.filter((p) => p.categoryId === myActiveCatId || childIds.includes(p.categoryId));
+              })()}
+              loading={loading.my}
+              emptyText={myActiveCatId ? '해당 카테고리의 게시글이 없습니다.' : '아직 작성한 글이 없습니다.'}
+              showVisibility
+              {...gridProps}
+            />
+          </>
         )}
 
         {activeTab === 'neighbor-mgmt' && (
@@ -491,7 +567,7 @@ export default function Home() {
                     <ul className="neighbor-list">
                       {pendingRequests.map((req) => (
                         <li key={req.id} className="neighbor-item">
-                          <div className="neighbor-avatar">{req.nickname?.[0] ?? '?'}</div>
+                          <Avatar profileImg={req.profileImg} nickname={req.nickname} className="neighbor-avatar" />
                           <span
                             className="neighbor-name clickable"
                             onClick={() => navigate(`/blog/${req.fromUserId}`)}
@@ -527,7 +603,7 @@ export default function Home() {
                     <ul className="neighbor-list">
                       {neighbors.map((n) => (
                         <li key={n.id} className="neighbor-item">
-                          <div className="neighbor-avatar">{n.nickname?.[0] ?? '?'}</div>
+                          <Avatar profileImg={n.profileImg} nickname={n.nickname} className="neighbor-avatar" />
                           <span
                             className="neighbor-name clickable"
                             onClick={() => navigate(`/blog/${n.userId}`)}
