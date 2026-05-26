@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+<<<<<<< HEAD
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //	implementation 'org.springframework.boot:spring-boot-starter-security'
 //	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -30,9 +31,12 @@ dependencies {
 //	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 //	testAnnotationProcessor 'org.projectlombok:lombok'
 //
+=======
+>>>>>>> develop
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.h2database:h2'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -41,7 +45,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
-	//jwt 관련 dependency
+	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'

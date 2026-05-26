@@ -6,6 +6,10 @@ import com.team.blog.domain.board.dto.response.CommentResponse;
 import com.team.blog.domain.board.entity.Comment;
 import com.team.blog.domain.board.repository.CommentRepository;
 import com.team.blog.domain.board.repository.PostRepository;
+import com.team.blog.domain.user.entity.UserEntity;
+import com.team.blog.domain.user.repository.UserRepository;
+import com.team.blog.global.api.ErrorCode;
+import com.team.blog.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,19 +23,20 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public CommentResponse create(Long userId, Long postId, CommentCreateRequest request) {
         validatePostExists(postId);
         Comment comment = new Comment(userId, postId, request);
         commentRepository.save(comment);
-        return new CommentResponse(comment);
+        return toResponse(comment);
     }
 
     public List<CommentResponse> getComments(Long postId) {
         validatePostExists(postId);
         return commentRepository.findAllByPostIdOrderByCreatedAtAsc(postId).stream()
-                .map(CommentResponse::new)
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -40,7 +45,7 @@ public class CommentService {
         Comment comment = getCommentOrThrow(commentId);
         validateOwner(comment, userId);
         comment.update(request);
-        return new CommentResponse(comment);
+        return toResponse(comment);
     }
 
     @Transactional
@@ -50,20 +55,27 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    private CommentResponse toResponse(Comment comment) {
+        UserEntity user = userRepository.findById(comment.getUserId()).orElse(null);
+        String nickname = user != null ? user.getNickname() : "알 수 없음";
+        String profileImg = user != null ? user.getProfileImg() : null;
+        return new CommentResponse(comment, nickname, profileImg);
+    }
+
     private void validatePostExists(Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new IllegalArgumentException("존재하지 않는 게시글입니다. id=" + postId);
+            throw new ApiException(ErrorCode.POST_NOT_FOUND);
         }
     }
 
     private Comment getCommentOrThrow(Long commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다. id=" + commentId));
+                .orElseThrow(() -> new ApiException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
     private void validateOwner(Comment comment, Long userId) {
         if (!comment.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("본인의 댓글만 수정/삭제할 수 있습니다.");
+            throw new ApiException(ErrorCode.COMMENT_FORBIDDEN);
         }
     }
 }

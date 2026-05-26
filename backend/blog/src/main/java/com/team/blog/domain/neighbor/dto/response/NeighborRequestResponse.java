@@ -1,7 +1,7 @@
 package com.team.blog.domain.neighbor.dto.response;
 
 import com.team.blog.domain.neighbor.entity.Neighbor;
-import com.team.blog.domain.user.entity.User;
+import com.team.blog.domain.user.entity.UserEntity;
 
 import java.time.LocalDateTime;
 
@@ -13,12 +13,12 @@ public record NeighborRequestResponse(
         String profileImg,
         LocalDateTime createdAt
 ) {
-    public static NeighborRequestResponse of(Neighbor neighbor, User user) {
+    public static NeighborRequestResponse of(Neighbor neighbor, UserEntity userEntity) {
         return new NeighborRequestResponse(
                 neighbor.getId(),
                 neighbor.getFromUserId(),
-                user.getNickname(),
-                user.getProfileImg(),
+                userEntity.getNickname(),
+                userEntity.getProfileImg(),
                 neighbor.getCreatedAt()
         );
     }

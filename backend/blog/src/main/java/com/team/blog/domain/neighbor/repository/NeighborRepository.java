@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /** 이웃 관계 레포지토리 */
 public interface NeighborRepository extends JpaRepository<Neighbor, Long> {
 
     boolean existsByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
+    Optional<Neighbor> findByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
 
     /** 특정 유저의 수락된 이웃 목록 (양방향) */
     @Query("SELECT n FROM Neighbor n WHERE (n.fromUserId = :userId OR n.toUserId = :userId) AND n.status = :status")
