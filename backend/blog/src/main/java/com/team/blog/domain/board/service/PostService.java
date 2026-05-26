@@ -2,6 +2,7 @@ package com.team.blog.domain.board.service;
 
 import com.team.blog.domain.board.dto.request.PostCreateRequest;
 import com.team.blog.domain.board.dto.request.PostUpdateRequest;
+import com.team.blog.domain.board.dto.response.PageResponse;
 import com.team.blog.domain.board.dto.response.PostResponse;
 import com.team.blog.domain.board.entity.Post;
 import com.team.blog.domain.board.entity.PostLike;
@@ -10,6 +11,7 @@ import com.team.blog.domain.board.repository.CommentRepository;
 import com.team.blog.domain.board.repository.PostLikeRepository;
 import com.team.blog.domain.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,22 @@ public class PostService {
         return postRepository.findAll().stream()
                 .map(PostResponse::new)
                 .toList();
+    }
+
+    public PageResponse<PostResponse> getPosts(String search, Pageable pageable) {
+        if (search == null || search.isBlank()) {
+            return PageResponse.from(postRepository.findPostsPage(null, null, pageable).map(PostResponse::new));
+        }
+        String s = "%" + search.trim().toLowerCase() + "%";
+        return PageResponse.from(postRepository.searchPosts(s, s, s, null, null, pageable).map(PostResponse::new));
+    }
+
+    public PageResponse<PostResponse> getUserPosts(Long userId, String search, Long categoryId, Pageable pageable) {
+        if (search == null || search.isBlank()) {
+            return PageResponse.from(postRepository.findPostsPage(userId, categoryId, pageable).map(PostResponse::new));
+        }
+        String s = "%" + search.trim().toLowerCase() + "%";
+        return PageResponse.from(postRepository.searchPosts(s, s, s, userId, categoryId, pageable).map(PostResponse::new));
     }
 
     public PostResponse getOne(Long postId) {
