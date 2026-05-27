@@ -34,22 +34,10 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .authorizeHttpRequests(auth -> auth
-<<<<<<< HEAD
-                .requestMatchers("/h2-console/**", "/", "/login", "/join").permitAll()
-                .anyRequest().permitAll()
-            )
-            .csrf(csrf -> csrf.disable())
-            .formLogin((auth) -> auth.disable())
-            .httpBasic((auth) -> auth.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .sessionManagement((session) -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-=======
                 .anyRequest().permitAll()
             )
             .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
->>>>>>> develop
         return http.build();
     }
 }

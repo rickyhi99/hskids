@@ -234,6 +234,11 @@ export default function Home() {
   const [feedSubTab, setFeedSubTab] = useState('all');
 
   const [allPosts, setAllPosts] = useState([]);
+  const [allSearchInput, setAllSearchInput] = useState('');
+  const [allSearch, setAllSearch] = useState('');
+  const [allPage, setAllPage] = useState(0);
+  const [allTotalPages, setAllTotalPages] = useState(0);
+
   const [neighborPosts, setNeighborPosts] = useState([]);
   const [myPosts, setMyPosts] = useState([]);
   const [myCategories, setMyCategories] = useState([]);
@@ -243,7 +248,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState({ all: false, neighbor: false, my: false });
 
-  const fetched = useRef({ all: false, neighbor: false, my: false });
+  const fetched = useRef({ neighbor: false, my: false });
 
   // ── 이웃 관리 ──────────────────────────────────────────────────
   const [neighbors, setNeighbors] = useState([]);
@@ -257,20 +262,27 @@ export default function Home() {
       .catch(() => {});
   }, [currentUser.id]);
 
-  // ── 데이터 패치 ──────────────────────────────────────────────
-  const fetchAll = useCallback(async () => {
-    if (fetched.current.all) return;
-    fetched.current.all = true;
+  // 전체 피드 검색 디바운스
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAllSearch(allSearchInput);
+      setAllPage(0);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [allSearchInput]);
+
+  // 전체 피드 - 검색/페이지 변경 시 재조회
+  useEffect(() => {
+    if (activeTab !== 'feed' || feedSubTab !== 'all') return;
     setLoading((l) => ({ ...l, all: true }));
-    try {
-      const res = await postApi.getAllPosts();
-      setAllPosts(res.data ?? []);
-    } catch {
-      fetched.current.all = false;
-    } finally {
-      setLoading((l) => ({ ...l, all: false }));
-    }
-  }, []);
+    postApi.getAllPosts(allSearch, allPage)
+      .then((res) => {
+        setAllPosts(res.content ?? []);
+        setAllTotalPages(res.totalPages ?? 0);
+      })
+      .catch(() => {})
+      .finally(() => setLoading((l) => ({ ...l, all: false })));
+  }, [activeTab, feedSubTab, allSearch, allPage]);
 
   const fetchNeighbor = useCallback(async () => {
     if (fetched.current.neighbor) return;
@@ -281,7 +293,7 @@ export default function Home() {
       const neighbors = neighborsRes.data ?? [];
       const postArrays = await Promise.all(
         neighbors.map((n) =>
-          postApi.getUserPosts(n.userId).then((r) => r.data ?? []).catch(() => [])
+          postApi.getUserPosts(n.userId, '', null, 0, 20).then((r) => r.content ?? []).catch(() => [])
         )
       );
       const merged = postArrays
@@ -332,15 +344,14 @@ export default function Home() {
   }, [currentUser]);
 
   useEffect(() => {
-    if (activeTab === 'feed') {
-      if (feedSubTab === 'all') fetchAll();
-      else fetchNeighbor();
+    if (activeTab === 'feed' && feedSubTab === 'neighbor') {
+      fetchNeighbor();
     } else if (activeTab === 'myblog') {
       fetchMy();
     } else if (activeTab === 'neighbor-mgmt') {
       fetchNeighborMgmt();
     }
-  }, [activeTab, feedSubTab, fetchAll, fetchNeighbor, fetchMy, fetchNeighborMgmt]);
+  }, [activeTab, feedSubTab, fetchNeighbor, fetchMy, fetchNeighborMgmt]);
 
   const handleAcceptRequest = useCallback(async (neighborId, fromUserId) => {
     try {
@@ -509,7 +520,65 @@ export default function Home() {
 
         {/* 콘텐츠 */}
         {activeTab === 'feed' && feedSubTab === 'all' && (
-          <PostGrid posts={allPosts} loading={loading.all} emptyText="아직 게시글이 없습니다." {...gridProps} />
+          <>
+            <div className="feed-search-bar">
+              <div className="feed-search-wrap">
+                <svg className="feed-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  className="feed-search-input"
+                  type="text"
+                  placeholder="제목, 내용, 작성자 검색..."
+                  value={allSearchInput}
+                  onChange={(e) => setAllSearchInput(e.target.value)}
+                />
+                {allSearchInput && (
+                  <button className="feed-search-clear" onClick={() => setAllSearchInput('')}>✕</button>
+                )}
+              </div>
+            </div>
+            <PostGrid posts={allPosts} loading={loading.all} emptyText={allSearch ? `"${allSearch}"에 대한 검색 결과가 없습니다.` : "아직 게시글이 없습니다."} {...gridProps} />
+            {allTotalPages > 1 && !loading.all && (
+              <div className="feed-pagination">
+                <button
+                  className="feed-page-btn"
+                  onClick={() => setAllPage((p) => p - 1)}
+                  disabled={allPage === 0}
+                >
+                  &lt;
+                </button>
+                {Array.from({ length: allTotalPages }, (_, i) => i)
+                  .filter((i) => Math.abs(i - allPage) <= 2 || i === 0 || i === allTotalPages - 1)
+                  .reduce((acc, i, idx, arr) => {
+                    if (idx > 0 && i - arr[idx - 1] > 1) acc.push('ellipsis');
+                    acc.push(i);
+                    return acc;
+                  }, [])
+                  .map((item, idx) =>
+                    item === 'ellipsis' ? (
+                      <span key={`e-${idx}`} className="feed-page-ellipsis">…</span>
+                    ) : (
+                      <button
+                        key={item}
+                        className={`feed-page-btn${item === allPage ? ' active' : ''}`}
+                        onClick={() => setAllPage(item)}
+                      >
+                        {item + 1}
+                      </button>
+                    )
+                  )}
+                <button
+                  className="feed-page-btn"
+                  onClick={() => setAllPage((p) => p + 1)}
+                  disabled={allPage >= allTotalPages - 1}
+                >
+                  &gt;
+                </button>
+              </div>
+            )}
+          </>
         )}
         {activeTab === 'feed' && feedSubTab === 'neighbor' && (
           <PostGrid posts={neighborPosts} loading={loading.neighbor} emptyText="이웃이 없거나 이웃의 게시글이 없습니다." {...gridProps} />

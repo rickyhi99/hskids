@@ -1,13 +1,22 @@
 import { request } from './http';
 
-export const getAllPosts = () =>
-  request('GET', '/api/posts');
+// 페이지네이션 응답: { content, page, size, totalElements, totalPages }
+export const getAllPosts = (search, page = 0, size = 10) =>
+  request('GET', '/api/posts', { params: { search: search || undefined, page, size } });
 
 export const getMyPosts = (numericId) =>
   request('GET', '/api/posts/me', { userId: numericId });
 
-export const getUserPosts = (userId) =>
-  request('GET', `/api/posts/users/${userId}`);
+// 특정 유저 포스트 (검색 + 카테고리 + 페이지네이션)
+export const getUserPosts = (userId, search, categoryId, page = 0, size = 10) =>
+  request('GET', `/api/users/${userId}/posts`, {
+    params: {
+      search: search || undefined,
+      category: categoryId || undefined,
+      page,
+      size,
+    },
+  });
 
 export const getOnePost = (postId) =>
   request('GET', `/api/posts/${postId}`);

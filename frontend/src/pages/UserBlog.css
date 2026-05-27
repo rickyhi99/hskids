@@ -194,6 +194,112 @@
   color: var(--accent-text);
 }
 
+/* ── 검색창 ── */
+.userblog-search-bar {
+  margin-bottom: 1.25rem;
+}
+
+.userblog-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border-light);
+  border-radius: 10px;
+  padding: 0.45rem 0.75rem;
+  max-width: 420px;
+  transition: border-color 0.2s;
+}
+.userblog-search-wrap:focus-within {
+  border-color: var(--accent);
+}
+
+.userblog-search-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  display: flex;
+}
+.userblog-search-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.userblog-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.userblog-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.userblog-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.userblog-search-clear:hover {
+  color: var(--text-primary);
+}
+
+/* ── 페이지네이션 ── */
+.userblog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  margin-top: 2.5rem;
+}
+
+.userblog-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.5rem;
+  border: 1.5px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.userblog-page-btn:hover:not(:disabled) {
+  background: var(--border-light);
+  color: var(--text-primary);
+}
+.userblog-page-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+.userblog-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.userblog-page-ellipsis {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0 4px;
+  user-select: none;
+}
+
 /* ── 그리드 ── */
 .userblog-grid {
   display: grid;

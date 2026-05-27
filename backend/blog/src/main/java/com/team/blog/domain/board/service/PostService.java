@@ -65,18 +65,18 @@ public class PostService {
 
     public PageResponse<PostResponse> getPosts(String search, Pageable pageable) {
         if (search == null || search.isBlank()) {
-            return PageResponse.from(postRepository.findPostsPage(null, null, pageable).map(PostResponse::new));
+            return PageResponse.from(postRepository.findPostsPage(null, null, pageable).map(this::toResponse));
         }
         String s = "%" + search.trim().toLowerCase() + "%";
-        return PageResponse.from(postRepository.searchPosts(s, s, s, null, null, pageable).map(PostResponse::new));
+        return PageResponse.from(postRepository.searchPosts(s, s, s, null, null, pageable).map(this::toResponse));
     }
 
     public PageResponse<PostResponse> getUserPosts(Long userId, String search, Long categoryId, Pageable pageable) {
         if (search == null || search.isBlank()) {
-            return PageResponse.from(postRepository.findPostsPage(userId, categoryId, pageable).map(PostResponse::new));
+            return PageResponse.from(postRepository.findPostsPage(userId, categoryId, pageable).map(this::toResponse));
         }
         String s = "%" + search.trim().toLowerCase() + "%";
-        return PageResponse.from(postRepository.searchPosts(s, s, s, userId, categoryId, pageable).map(PostResponse::new));
+        return PageResponse.from(postRepository.searchPosts(s, s, s, userId, categoryId, pageable).map(this::toResponse));
     }
 
     public PostResponse getOne(Long postId) {

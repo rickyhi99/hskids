@@ -104,8 +104,8 @@ export default function RabbitChatbot() {
 
     if (opt.id === 'popular') {
       try {
-        const res = await postApi.getAllPosts();
-        const posts = (res.data ?? [])
+        const res = await postApi.getAllPosts('', 0, 100);
+        const posts = (res.content ?? [])
           .sort((a, b) => b.likeCount - a.likeCount)
           .slice(0, 3);
         if (posts.length === 0) {
