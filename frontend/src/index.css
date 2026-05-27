@@ -4,6 +4,10 @@
   padding: 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 :root {
   --bg: #f4f5f7;
   --surface: #ffffff;

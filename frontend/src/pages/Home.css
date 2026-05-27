@@ -537,7 +537,7 @@
 /* ── 이웃 관리 ── */
 .neighbor-mgmt {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 1.5rem auto 0;
   padding: 0 1rem;
 }
 
@@ -645,3 +645,107 @@
   cursor: pointer;
 }
 .btn-delete-neighbor:hover { background: #fef2f2; }
+
+/* ── 전체 피드 검색 ── */
+.feed-search-bar {
+  margin: 0.75rem 0 1.25rem;
+}
+
+.feed-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border-light);
+  border-radius: 10px;
+  padding: 0.5rem 0.85rem;
+  max-width: 460px;
+  transition: border-color 0.2s;
+}
+.feed-search-wrap:focus-within {
+  border-color: var(--accent);
+}
+
+.feed-search-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.feed-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.feed-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.feed-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.feed-search-clear:hover {
+  color: var(--text-primary);
+}
+
+/* ── 전체 피드 페이지네이션 ── */
+.feed-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.feed-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.5rem;
+  border: 1.5px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.feed-page-btn:hover:not(:disabled) {
+  background: var(--border-light);
+  color: var(--text-primary);
+}
+.feed-page-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+.feed-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.feed-page-ellipsis {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0 4px;
+  user-select: none;
+}
